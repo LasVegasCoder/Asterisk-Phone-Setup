@@ -43,6 +43,9 @@ cd pjproject
 ./configure --enable-shared --disable-sound --disable-resample --disable-video --disable-opencore-amr
 make dep && make && make install
 
+Just in case, you might want to install these:
+sudp apt-get install mpg123 libmpg123-0 sox openssl subversion openssh-server 
+
 Let's get sound into asterisk directory with:
 cd /var/lib/asterisk/sounds
 wget http://downloads.asterisk.org/pub/telephony/sounds/asterisk-core-sounds-en-wav-current.tar.gz
