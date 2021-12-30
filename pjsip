@@ -1,0 +1,42 @@
+Example of a pjsip config file
+
+
+pjsip.conf
+[transport-udp]
+type=transport
+protocol=udp
+bind=0.0.0.0
+
+;Templates for the necessary config sections
+
+[endpoint_internal](!)
+type=endpoint
+context=from-internal
+disallow=all
+allow=ulaw
+
+[auth_userpass](!)
+type=auth
+auth_type=userpass
+
+[aor_dynamic](!)
+type=aor
+max_contacts=1
+
+;Definitions for our phones, using the templates above
+
+[demo-alice](endpoint_internal)
+auth=demo-alice
+aors=demo-alice
+[demo-alice](auth_userpass)
+password=alice777 ; put a strong, unique password here instead
+username=demo-alice
+[demo-alice](aor_dynamic) 
+
+[demo-bob](endpoint_internal)
+auth=demo-bob
+aors=demo-bob
+[demo-bob](auth_userpass)
+password=bob777 ; put a strong, unique password here instead
+username=demo-bob
+[demo-bob](aor_dynamic) 
