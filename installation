@@ -1,0 +1,67 @@
+Start by updating and upgrading your system with the following command.
+apt-get update; sudo apt-get upgrade -y
+
+Install the following dependencies with the following command:
+sudo apt-get install -y build-essential git-core pkg-config subversion libjansson-dev sqlite autoconf automake libtool libxml2-dev libncurses5-dev unixodbc unixodbc-dev libasound2-dev libogg-dev libvorbis-dev libneon27-dev libsrtp0-dev libspandsp-dev uuid uuid-dev sqlite3 libsqlite3-dev libgnutls-dev libtool-bin python-dev texinfo
+
+Reboot your system so that your system will recognise what was installed, do:
+sudo shutdown -r now
+
+Let's install linux header for your system with:
+sudo apt-get install wget libssl-dev libncurses5-dev libnewt-dev  libxml2-dev linux-headers-$(uname -r) libsqlite3-dev uuid-dev
+
+Now change directory, to and clone iksemel, configure and it with:
+cd /usr/src
+git clone git://github.com/meduketto/iksemel
+cd iksemel
+./autogen.sh
+./configure
+make && make install
+
+
+Get dahdi and install it with:
+cd /usr/src
+wget http://downloads.asterisk.org/pub/telephony/dahdi-linux-complete/dahdi-linux-complete-current.tar.gz
+tar xvfz dahdi-linux-complete-current.tar.gz
+cd dahdi-linux-complete-*
+make all && make install && make config
+
+ ./contrib/scripts/install_prereq install
+./contrib/scripts/install_prereq install-unpackaged
+
+Time to install libpri with:
+cd /usr/src
+wget http://downloads.asterisk.org/pub/telephony/libpri/libpri-1.4-current.tar.gz
+tar xvfz libpri-1.4-current.tar.gz
+cd libpri-*
+make && make install
+
+Now install the asterisk from git with:
+cd /usr/src/
+git clone https://github.com/asterisk/pjproject.git
+cd pjproject
+./configure --enable-shared --disable-sound --disable-resample --disable-video --disable-opencore-amr
+make dep && make && make install
+
+Let's get sound into asterisk directory with:
+cd /var/lib/asterisk/sounds
+wget http://downloads.asterisk.org/pub/telephony/sounds/asterisk-core-sounds-en-wav-current.tar.gz
+wget http://downloads.asterisk.org/pub/telephony/sounds/asterisk-extra-sounds-en-wav-current.tar.gz
+tar xvf asterisk-core-sounds-en-wav-current.tar.gz
+rm -f asterisk-core-sounds-en-wav-current.tar.gz
+tar xfz asterisk-extra-sounds-en-wav-current.tar.gz
+rm -f asterisk-extra-sounds-en-wav-current.tar.gz
+
+# Don't forget the Wideband Audio download
+wget http://downloads.asterisk.org/pub/telephony/sounds/asterisk-core-sounds-en-g722-current.tar.gz
+wget http://downloads.asterisk.org/pub/telephony/sounds/asterisk-extra-sounds-en-g722-current.tar.gz
+tar xfz asterisk-extra-sounds-en-g722-current.tar.gz
+rm -f asterisk-extra-sounds-en-g722-current.tar.gz
+tar xfz asterisk-core-sounds-en-g722-current.tar.gz
+rm -f asterisk-core-sounds-en-g722-current.tar.gz
+
+And we're done!
+
+
+
+
