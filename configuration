@@ -1,0 +1,166 @@
+The following is an example of a working sip and pjsip config file for asterisk, change as necessary.
+
+open  /etc/asterisk/sip.conf and paste the following config in there, change as necessary.
+
+[general]
+transport=udp
+ 
+alwaysauthreject = yes 
+g726nonstandard = yes          ; If the peer negotiates G726-32 audio, use AAL2 packing
+
+;IDENTIFICATION
+domain=
+domain=174.71.241.22
+domain=172.56.16.239
+fromdomain=sip.vegasnewspaper.com
+autodomain=yes 
+useragent=Vegas Newspaper Secure Phone Server
+sdpsession=Vegas Newspaper PBX Session
+rtp_engine=vegasnewspaperSecurePhone
+
+;ENCRYPTION
+;tlscertfile=</path/to/certificate.pem> ; Certificate chain (*.pem format only) to use for TLS connections
+;tlsprivatekey=</path/to/private.pem> ; Private key file (*.pem format only) for TLS connections.
+;tlscapath=</path/to/ca/dir>
+
+; ERROR CORRECTION
+t38pt_udptl=yes
+t38pt_rtp=yes
+t38pt_tcp=yes 
+
+;DEFINE VIDEO SUPPORT
+videosupport=no
+;media_address = 172.16.42.1
+
+;DEFINE SUPPORT
+dtmfmode=rfc2833
+;transport=tls
+;tlsenable=yes
+;tlsbindaddr=0.0.0.0
+;tlscertfile=/etc/asterisk/keys/asterisk.pem
+;tlscafile=/etc/asterisk/keys/ca.crt
+;tlscipher=ALL
+;tlsclientmethod=tlsv1 ;none of the others seem to work with Blink as the client
+
+
+; NETWORKING - NATTED
+;nat=auto_force_rport,force_rport default ( nat = auto_comedia )
+nat = auto_comedia
+directmedia=update,nonat
+autodomain=yes
+externip=5.9.57.147/255.255.255.224
+externaddr=5.9.57.147
+externaddr=sip.vegasnewspaper.com
+localnet=10.0.80.0/255.255.255.0
+localnet=192.168.0.0/255.255.0.0 ; RFC 1918 addresses
+localnet=10.0.0.0/255.0.0.0      ; Also RFC1918
+localnet=172.16.0.0/12           ; Another RFC1918 with CIDR notation
+localnet=169.254.0.0/255.255.0.0 ; Zero conf local network
+
+;DEFINE FRIENDS FOR INTERNAL
+[friends_internal](!)
+type=friend
+host=dynamic
+
+;DEFINE SUPPORT
+dtmfmode=rfc2833
+;transport=tls
+
+;DEFINE IDENTIFICATION
+context=from-internal
+
+;DEFINE NETWORK
+nat=auto_comedia
+nat = auto_comedia
+directmedia=update,nonat
+autodomain=yes
+externip=5.9.57.147/255.255.255.224
+externaddr=5.9.57.147
+externaddr=sip.vegasnewspaper.com
+localnet=10.0.80.0/255.255.255.0
+
+;DEFINE SIGNALING
+disallow=all
+allow=ulaw
+bindport=5060                   ; bindport is the local UDP port that Asterisk will listen on
+bindaddr=0.0.0.0           ; IP address to bind to (0.0.0.0 binds to all)
+udpbindaddr=0.0.0.0             ; IP address to bind UDP listen socket to (0.0.0.0 binds to all)
+allow=gsm
+allow=ulaw 
+allow=alaw
+allow=g729
+qualify=yes
+qualify=yes
+qualifyfreq=20
+keepalive=30﻿
+canreinvite=no
+promiscredir=yes
+srvlookup=no
+directrtpsetup=no
+trustpid=yes
+sendrpid=yes
+callevents=yes
+insecure=invite
+pedantic=yes
+
+;DEFINE ACCOUNT FOR THIS FRIENDS
+;#include "from-internal-account.conf"
+[prince](friends_internal)
+secret=yourpassgoeshere
+
+[vegasnewspaper](friends_internal)
+secret=yourpassgoeshere
+
+[representative](friends_internal)
+secret=yourpassgoeshere
+
+[sales](friends_internal)
+secret=yourpassgoeshere
+  
+[support](friends_internal)
+secret=yourpassgoeshere
+
+[administration](friends_internal)
+secret=yourpassgoeshere
+
+[admanager1](friends_internal)
+secret=yourpassgoeshere
+
+[admanager2](friends_internal)
+secret=yourpassgoeshere
+
+; END OF FRIENDS
+
+;DEFINE BEGIN PEERS
+
+;TRUNKING SETUP
+
+;#include "twilio.conf"
+
+;host=vegas.pstn.twilio.com
+;username=MyVegasTrunk
+;secret=yourpassgoeshere
+;type=peer
+
+[twiliocall]
+host=vegas.pstn.domain.com
+username=MyVegasTrunk
+remotesecret=yourpassgoeshere
+type=peer
+
++++++++++++++++++++++++++++++++++++++++
+
+FOR INCOMING CALLS:
+Open /etc/extensions.conf and paste this following in there, change as necessary.
+[incoming]
+exten => s,1,Answer()
+exten => s,n,Dial(SIP/vegasnewspaper,60)
+exten => s,n,Playback(vm-nobodyavail)
+exten => s,n,VoiceMail(100@main)
+exten => s,n,Hangup()	
+++++++++++++++++++++++++++++++++++++++++
+
+Restart your phone system.
+
+
+exten => _09.,1,Dial(SIP/${EXTEN:2}@twilio)
