@@ -1,0 +1,83 @@
+Use below commands as a reference to setup your cisco 2950 for both data and voice
+
+line console 0
+loggin synchronous
+no exec-timeout 5 0
+login local
+exit
+
+line vty 0 15
+loggin asynchrous
+no exec-timeout
+login local
+privilege level 15
+trasport input ssh
+exit
+
+enable secret secret
+servicew password-enc
+username username privilege 15 password 0 password
+banner login ^
+Set up your pretty banner
+Your 
+
+^
+
+int fa0/0
+no ip add
+no shut
+
+int fa0/0.10
+en d1q 10
+ip add 192.168.10.1 255.255.255.0
+exit
+
+int fa0/0.20
+en dot1q 20
+ip add 192.168.20.1 255.255.255.0
+exit
+
+
+ip dhcp excluded-address 192.168.10.1 192.168.10.5
+ip dhcp excluded-address 192.168.20.1 129.168.20.5
+
+ip dhcp pool voice 
+network 192.68.10.0 
+default-route 192.168.10.1
+option 150 ip 192.168.10.1
+exit
+
+
+ip dhcp pool data
+network 192.168.20.1
+default-route 192.168.20.1
+option 150 ip 19.168.10.1
+exit
+
+
+router rip
+version 2
+network 192.168.10.0
+network 192.168.20.0
+no auto-summary
+exit
+
+clock timezone utc 5 30
+ntp master 2
+clocl set 10:00:00 2 feb 2015
+
+telephony-service
+max-ephone 2
+max-dn 20
+auto-reg-ephone'auto assign 1 to 2
+create cnf-files
+
+copy run start
+
+ip http server
+ip http secure-server
+ip http authentication local
+ip http timeout-policy idle 600 life 86400 reques 86400
+ip http path flash:/gui
+exit
+
